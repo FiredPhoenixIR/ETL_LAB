@@ -26,10 +26,11 @@ def extract_csv(csvfile):
     for csvfile in glob.glob(csvfile):
         extracted_data= extracted_data.append(extract_from_csv(csvfile),ignore_index=True)
     extracted_data.columns.values[1] = 'Currency'
+    extracted_data=extracted_data[['Currency','Rates']]
     return extracted_data
   
 extracted_csvdata=extract_csv('./exchange_rates.csv')
-extracted_csvdata=extracted_csvdata[['Currency','Rates']]
+#extracted_csvdata=extracted_csvdata[['Currency','Rates']]
 
 
 def exhchange_rate(currency_symbol):
@@ -38,7 +39,7 @@ def exhchange_rate(currency_symbol):
 
 #exhchange_rate('GBP') as dataframe
 
-def transform(first_symbol,second_symbol):
+def transform_rates(first_symbol,second_symbol):
     rate_first=exhchange_rate(first_symbol)
     rate_first=rate_first['Rates'].to_list()
     rate_second=exhchange_rate(second_symbol)
@@ -46,7 +47,18 @@ def transform(first_symbol,second_symbol):
     rate_to_rate=rate_first[0]/rate_second[0]
     return rate_to_rate
 
-#transform('USD','GBP') as number
+#transform_rates('USD','GBP') as number
+
+def transform(extracted_data,fromsymbol,tosymbol):
+    #extracted_data=extract_json('./bank_market_cap_1.json').head()
+    extracted_data = extracted_data.rename(columns={"Market Cap (US$ Billion)": "Market Cap (USD$ Billion)"})
+    new_column_name = f"Market Cap ({tosymbol}$ Billion)"
+    old_column_name = f"Market Cap ({fromsymbol}$ Billion)"
+    extracted_data[old_column_name] = extracted_data[old_column_name].apply(lambda x: x * transform_rates(fromsymbol,tosymbol))
+    extracted_data=extracted_data.rename(columns={old_column_name: new_column_name})
+    return extracted_data
+
+#transform(extracted_data,'USD','GBP')
 
 #load dataframe to csv
 def load_to_csv(tagetfilename,data_to_load):
@@ -62,3 +74,4 @@ def log(message):
     timestamp= now.strftime(timestamp_format)
     with open ("logfile.txt", "a") as f:
         f.write (timestamp + ',' + message + '\n')
+
