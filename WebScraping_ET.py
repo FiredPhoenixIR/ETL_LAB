@@ -11,7 +11,7 @@ import pandas as pd
 
 url_to_scrap="https://web.archive.org/web/20200318083015/https://en.wikipedia.org/wiki/List_of_largest_banks"
 response=requests.get(url_to_scrap)
-html_data=response.content
+html_data=response.content #response.text
 
 #html_data[760:783]
 # You can alos use if response.status_code == 200
