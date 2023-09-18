@@ -49,12 +49,12 @@ def transform_rates(first_symbol,second_symbol):
 
 #transform_rates('USD','GBP') as number
 
-def transform(extracted_data,fromsymbol,tosymbol):
-    #extracted_data=extract_json('./bank_market_cap_1.json').head()
+def transform(extracted_data,tosymbol,fromsymbol):
+    extracted_data=extract_json('./bank_market_cap_1.json').head()
     extracted_data = extracted_data.rename(columns={"Market Cap (US$ Billion)": "Market Cap (USD$ Billion)"})
     new_column_name = f"Market Cap ({tosymbol}$ Billion)"
     old_column_name = f"Market Cap ({fromsymbol}$ Billion)"
-    extracted_data[old_column_name] = extracted_data[old_column_name].apply(lambda x: x * transform_rates(fromsymbol,tosymbol))
+    extracted_data[old_column_name] = extracted_data[old_column_name].apply(lambda x: round(x * transform_rates(tosymbol, fromsymbol), 3))
     extracted_data=extracted_data.rename(columns={old_column_name: new_column_name})
     return extracted_data
 
